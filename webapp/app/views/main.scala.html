@@ -1,0 +1,270 @@
+@(title: String)(content: Html)(implicit request: RequestHeader)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+		<link rel="shortcut icon" type="image/x-icon" href="@routes.Assets.at("images/favicon.ico")">
+		<!-- <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")"> -->
+        <script src="@routes.Assets.at("javascripts/jquery/jquery-1.8.3.min.js")" type="text/javascript"></script>
+    </head>
+<script>
+function getFormData(form, names) {
+	var params = undefined;
+	names.forEach(function(val) {
+		if (params == undefined) params = ""; else params += "&";  
+	    params += val+"="+ form.elements[val].value
+	}
+	);
+	return params
+}
+
+function submitForm(form, url, params) {
+	var formData = getFormData(form,params)
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", url + "?"+formData, true);
+	xhr.onload = function(e) {
+		if (this.status == 200) {
+			console.log(this.responseText);
+		}
+		else {
+			console.log(this.status+":"+this.responseText);
+		}
+	};
+	xhr.send(formData);
+}
+
+
+function submitEmailEnroll(obj) {
+	submitForm(obj.form, "/email-enroll", ["email"])
+}
+
+function submitEmailValidate(obj) {
+	submitForm(obj.form, "/email-validate", ["code"])
+}
+
+function submitRoomOpen(obj) {
+	submitForm(obj.form, "/room-open", ["roomOwner"])
+}
+
+function submitParticipatsInvite(obj) {
+	submitForm(obj.form, "/participants-invite", ["roomOwner", "emails"])
+}
+
+function submitParticipantsRevoke(obj) {
+	submitForm(obj.form, "/participant-revoke", ["roomOwner", "participantEmail"])
+}
+
+function submitParticipantsList(obj) {
+	submitForm(obj.form, "/participants-list", ["roomOwner"])
+}
+
+function submitStartVoteSession(obj) {
+	submitForm(obj.form, "/vote-session-start", ["roomOwner"])
+}
+
+function submitVote(obj) {
+	submitForm(obj.form, "/room-vote-submit", ["roomOwner", "email", "card"])
+}
+
+function submitStopVoteSession(obj) {
+	submitForm(obj.form, "/vote-session-stop", ["roomOwner"])
+}
+
+function submitCollectVote(obj) {
+	submitForm(obj.form, "/room-votes-collect", ["roomOwner"])
+}
+
+function submitCloseRoom(obj) {
+	submitForm(obj.form, "/room-close", ["roomOwner"])
+}
+
+function submitParticipantsRoom(obj) {
+	submitForm(obj.form, "/participant-rooms", ["participantEmail"])
+}
+function submitRoomConnect (obj) {
+
+	var roomConnectURL = "ws://localhost:9000/room-connect?"+getFormData(obj.form,["roomOwner", "participantEmail"])
+	var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket
+    //var roomSocket = new WS("@routes.AkkaCardController.roomConnect("hayssam@saleh.fr", "moi@ebiznext.com").webSocketURL()");
+    var roomSocket = new WS(roomConnectURL);
+    roomSocket.onmessage = function(event) {
+	    console.log(event.data);
+    	var data = JSON.parse(event.data);
+        	// Handle errors
+        	if (data.error) {
+            	roomSocket.close();
+        	} else {
+        		var s = ""
+	        	for (prop in data) {
+    	    		s +=prop+"="+data[prop];
+        		}
+	        	console.log(s);
+    	    }
+		} 
+}
+
+
+
+</script>
+<body onload="">
+<HR>
+<H1>Validate Email</H1>    
+<form>
+	  <label>Enter your email:</label>
+      <input type="text" name="email" value="hayssam.saleh@@ebiznext.com"><br>
+      <input type="button" value="Enroll Email" onclick="submitEmailEnroll(this)"><br>
+</form>
+<form>
+	  <label>Enter received code:</label>
+      <input type="text" name="code" value="1234"><br>
+      <input type="button" value="Enroll Email" onclick="submitEmailValidate(this)"><br>
+</form>
+<HR>
+<H1>Open Room</H1>    
+<form>
+	  <label>Room Owner:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Open Room" onclick="submitRoomOpen(this)"><br>
+</form>
+<HR>
+<H1>Invite Participants</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+	  <label>Participant:</label>
+      <select name="emails">
+		<option selected value = "moi@@ebiznext.com">moi@@ebiznext.com</option>
+		<option value = "toi@@ebiznext.com">toi@@ebiznext.com</option>
+		<option value = "lui@@ebiznext.com">lui@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Invite Participants" onclick="submitParticipatsInvite(this)"><br>
+</form>
+<HR>
+<H1>Room Connect</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+	  <label>Participant:</label>
+      <select name="participantEmail">
+		<option selected value = "moi@@ebiznext.com">moi@@ebiznext.com</option>
+		<option value = "toi@@ebiznext.com">toi@@ebiznext.com</option>
+		<option value = "lui@@ebiznext.com">lui@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Room Connect" onclick="submitRoomConnect(this)"><br>
+</form>
+<HR>
+<H1>Revoke Participants</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+	  <label>Participants:</label>
+      <select name="participantEmail">
+		<option selected value = "moi@@ebiznext.com">moi@@ebiznext.com</option>
+		<option value = "toi@@ebiznext.com">toi@@ebiznext.com</option>
+		<option value = "lui@@ebiznext.com">lui@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Revoke Participants" onclick="submitParticipantsRevoke(this)"><br>
+</form>
+<HR>
+<H1>List Participants</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="List Participants" onclick="submitParticipantsList(this)"><br>
+</form>
+<HR>
+<H1>Start Vote Session</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Start Vote Session" onclick="submitStartVoteSession(this)"><br>
+</form>
+<HR>
+<H1>Vote</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+	  <label>Participants:</label>
+      <select name="email">
+		<option selected value = "moi@@ebiznext.com">moi@@ebiznext.com</option>
+		<option value = "toi@@ebiznext.com">toi@@ebiznext.com</option>
+		<option value = "lui@@ebiznext.com">lui@@ebiznext.com</option>
+      </select>
+	  <label>Cards:</label>
+      <select name="card">
+		<option selected value ="1">un</option>
+		<option value = "2">deux</option>
+		<option value = "3">trois</option>
+      </select>
+      <input type="button" value="Submit Vote" onclick="submitVote(this)"><br>
+</form>
+<HR>
+<H1>Stop Vote Session</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Stop Vote Session" onclick="submitStopVoteSession(this)"><br>
+</form>
+<HR>
+<H1>Collect Votes</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Collect Votes" onclick="submitCollectVote(this)"><br>
+</form>
+<HR>
+<H1>Close Room</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="roomOwner">
+		<option value = "owner1@@ebiznext.com">owner1@@ebiznext.com</option>
+		<option value = "owner2@@ebiznext.com">owner2@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Close Room" onclick="submitCloseRoom(this)"><br>
+</form>
+<HR>
+<H1>Participants Room</H1>    
+<form>
+	  <label>Room:</label>
+      <select name="participantEmail">
+		<option selected value = "moi@@ebiznext.com">moi@@ebiznext.com</option>
+		<option value = "toi@@ebiznext.com">toi@@ebiznext.com</option>
+		<option value = "lui@@ebiznext.com">lui@@ebiznext.com</option>
+      </select>
+      <input type="button" value="Participants List" onclick="submitParticipantsRoom(this)"><br>
+</form>
+
+
+<!-- @content !>
+</body>
+</html>
+ 

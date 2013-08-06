@@ -1,0 +1,17 @@
+@(message: String)(implicit request: RequestHeader)
+<html>
+<head>
+<title>@message</title>
+<link rel="shortcut icon" type="image/x-icon" href="@routes.Assets.at("images/favicon.ico")">
+<link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+</head>
+
+<center>
+	<img src="@routes.Assets.at("images/planningpoker.png")" alt="Plannin Poker" />
+</center>
+
+@********************* 
+@main("Scrum-Deck") { 
+	@play20.welcome(message) 
+}
+*********************@

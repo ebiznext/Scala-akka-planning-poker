@@ -1,0 +1,49 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           	controllers.Application.index
+
+# Permet à un Scrum Master d'ouvrir la session d'évaluation de charge du Sprint
+GET     /room-open			           	controllers.AkkaCardController.roomOpen(roomOwner:String)
+
+# Permet à un Scrum Master de fermer explicitement la session d'évaluation de charge du Sprint
+GET     /room-close           	      	controllers.AkkaCardController.roomClose(roomOwner:String)
+
+# Permet à un Scrum Master d'ouvrir un vote
+GET     /vote-session-start			           	controllers.AkkaCardController.voteSessionStart(roomOwner:String)
+
+# Permet à un Scrum Master de fermer explicitement le vote en cours
+GET     /vote-session-stop			           	controllers.AkkaCardController.voteSessionStop(roomOwner:String)
+
+# Permet à un participant de communiquer son chiffrage pour une user-story
+GET     /room-vote-submit       	  	controllers.AkkaCardController.submitVote(roomOwner:String, email:String, card:String)
+
+# Permet au Scrum Master de collecter en temps réel les votes des participants via un WebSocket
+GET     /room-votes-collect        	    controllers.AkkaCardController.collectVotes(roomOwner:String)
+
+# Permet au Scrum master 'inviter un ou plusieurs particpants à la session de chiffrage du sprint
+GET     /participants-invite		    controllers.AkkaCardController.particpantsInvite(roomOwner:String, emails: List[String])
+
+# Permet au Scrum master de retirer un particpant de la session
+GET		/participant-revoke				controllers.AkkaCardController.participantRevoke(roomOwner:String, participantEmail: String)
+
+# Permet au Scrum master de récupérer la liste des participants connectés / doconnectés en temps réel via les WebSockets
+GET     /participants-list				controllers.AkkaCardController.particpantsList(roomOwner:String)
+
+# Permet de récuéprer les rooms dans lesquelles un particpant est enregistré.
+GET     /participant-rooms				controllers.AkkaCardController.particpantRooms(participantEmail:String)
+
+# Connect un utilisateur à la salle de jeu
+GET     /room-connect				controllers.AkkaCardController.roomConnect(roomOwner:String, participantEmail:String)
+
+# Check email by sending an numeric code to the user
+GET 	/email-enroll					controllers.EnrollController.enrollEmail(email:String)
+
+# User is sending back the numerical code he received
+GET 	/email-validate					controllers.EnrollController.validateKey(code : String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               	controllers.Assets.at(path="/public", file)
+

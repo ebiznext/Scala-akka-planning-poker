@@ -1,0 +1,34 @@
+*.class
+*.log
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+graphics/
+# Scala-IDE specific
+.scala_dependencies
+
+# Play specific
+logs
+project/project
+project/target
+target
+tmp
+.history
+dist
+
+#eclipse specific
+.classpath
+.project
+.settings
+.target
+bin
+
+# ivy specific
+.cache
+
+
