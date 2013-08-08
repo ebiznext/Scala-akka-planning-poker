@@ -19,9 +19,3 @@ object AESEncryption {
     new String(encipher.doFinal(Base64.decodeBase64(data64)))
   }
 }
-
-object Test extends App {
-  val x = AESEncryption.encrypt("1234".toCharArray().map(_.toByte), "AsECretKeyPlaNNi")
-  println(x)
-  println(AESEncryption.decrypt(x, "AsECretKeyPlaNNi"))
-}
