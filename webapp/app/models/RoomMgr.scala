@@ -53,10 +53,7 @@ case class RoomMgr(val owner: String,
       participants -= participantId
 
     case ContainsParticipant(participantId) =>
-      sender ! (participants.get(participantId) match {
-        case Some(participant) => Some(owner)
-        case None => None
-      })
+      sender ! participants.get(participantId)
 
     case StartNewVoteSession =>
       voteSessions ::= VoteSession()
